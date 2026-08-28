@@ -1,8 +1,9 @@
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from service.db import get_db
+from service.db import Base, get_db
 from service.main import app
 from service.settings import Settings
 
@@ -26,6 +27,10 @@ async def db_session(engine):
     async with async_session() as session:
         yield session
         await session.rollback()
+        for _, table in Base.metadata.tables.items():
+            query = delete(table)
+            await session.execute(query)
+        await session.commit()
 
 
 @pytest_asyncio.fixture
