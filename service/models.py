@@ -1,3 +1,5 @@
+"""SQLAlchemy ORM models."""
+
 from datetime import datetime
 
 from sqlalchemy import BigInteger, DateTime, Integer, String, func
@@ -7,6 +9,8 @@ from .db import Base
 
 
 class URL(Base):
+    """A shortened URL: its short code, target, and click stats."""
+
     __tablename__ = "urls"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)

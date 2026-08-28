@@ -1,3 +1,5 @@
+"""Database engine, session factory, and the ORM declarative base."""
+
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -9,9 +11,10 @@ async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
 async def get_db():
+    """FastAPI dependency that yields a request-scoped DB session."""
     async with async_session() as session:
         yield session
 
 
 class Base(DeclarativeBase):
-    pass
+    """Base class for all ORM models."""
