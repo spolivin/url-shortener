@@ -33,20 +33,17 @@ A simple URL shortener built with FastAPI and Postgres.
 Tests run against a separate Postgres instance (`test-db`), kept isolated from the dev database so test runs never touch real data.
 
 1. Copy `.env.test.example` to `.env.test` and adjust credentials if needed.
-2. Start the test database:
+2. Run the tests:
    ```
-   docker compose up -d test-db
+   make test
    ```
-3. Apply migrations to it:
+   This starts `test-db` if it isn't already running, waits for it to be healthy, applies migrations, and runs `pytest`. Safe to re-run - it's a no-op to start an already-running `test-db` and to re-apply already-applied migrations.
+3. Stop the test database when you're done:
    ```
-   make migrate-test
-   ```
-4. Run the tests:
-   ```
-   uv run pytest
+   make test-db-down
    ```
 
-`test-db` uses `tmpfs` for its data directory, so its contents don't survive a container restart/recreate — migrations need to be re-applied after that.
+`test-db` uses `tmpfs` for its data directory, so its contents don't survive a container restart/recreate - `make test` re-applies migrations automatically each time, so this is only a concern if you're inspecting the database directly (e.g. via `make psql-test`).
 
 ## Endpoints
 
@@ -77,6 +74,8 @@ Tests run against a separate Postgres instance (`test-db`), kept isolated from t
 - `make db-up` / `make db-down` - start/stop Postgres.
 - `make migrate` - apply pending Alembic migrations.
 - `make migrate-test` - apply pending Alembic migrations to `test-db`.
+- `make test-db-up` / `make test-db-down` - start (and wait healthy + migrate) / stop `test-db`.
+- `make test` - run the test suite (implies `test-db-up`).
 - `make psql` - open a `psql` shell against the running Postgres container.
 - `make psql-test` - open a `psql` shell against the running `test-db` container.
 - `make lint` / `make format` - ruff.
@@ -84,4 +83,4 @@ Tests run against a separate Postgres instance (`test-db`), kept isolated from t
 
 ## Status
 
-Core shorten + redirect flow works end-to-end. `GET /health` has test coverage; `/shorten` and `/{short_code}` do not yet. Not yet implemented: click-count tracking, rate limiting.
+Core shorten + redirect flow works end-to-end, with test coverage for all three endpoints, including the `/shorten` retry-on-collision logic. Not yet implemented: click-count tracking, rate limiting.
