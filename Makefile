@@ -10,10 +10,10 @@ lint:
 	uv run ruff check .
 
 db-up:
-	docker compose up -d
+	docker compose up -d --wait db
 
 db-down:
-	docker compose down
+	docker compose down db
 
 psql:
 	docker compose exec db psql -U $$POSTGRES_USER -d $$POSTGRES_DB
