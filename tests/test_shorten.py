@@ -46,3 +46,11 @@ async def test_shorten_collision_overcome(mocker, client, db_session):
     assert response.status_code == 200
     assert response.json()["short_code"] == "bbbbbb"
     assert mock_generate_code.call_count == 2
+
+
+async def test_shorten_invalid_long_url(client):
+    """Invalid `long_url` does not pass Pydantic validation."""
+    payload = {"long_url": "invalidurl"}
+    response = await client.post("/shorten", json=payload)
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["body", "long_url"]
