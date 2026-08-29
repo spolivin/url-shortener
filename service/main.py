@@ -3,7 +3,7 @@
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, HttpUrl
-from sqlalchemy import select, text
+from sqlalchemy import select, text, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -59,6 +59,13 @@ async def get_code(short_code: str, session: AsyncSession = Depends(get_db)):
     result = await session.execute(query)
     item = result.scalar_one_or_none()
     if item is not None:
+        update_query = (
+            update(URL)
+            .where(URL.short_code == short_code)
+            .values(click_count=URL.click_count + 1)
+        )
+        await session.execute(update_query)
+        await session.commit()
         return RedirectResponse(url=item.long_url, status_code=status.HTTP_302_FOUND)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not found")
