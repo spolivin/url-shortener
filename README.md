@@ -83,4 +83,4 @@ Tests run against a separate Postgres instance (`test-db`), kept isolated from t
 
 ## Status
 
-Core shorten + redirect flow works end-to-end, with test coverage for all three endpoints, including the `/shorten` retry-on-collision logic. Not yet implemented: click-count tracking, rate limiting.
+Core shorten + redirect flow works end-to-end, with test coverage for all three endpoints, including the `/shorten` retry-on-collision logic and click-count tracking on redirect. Not yet implemented: rate limiting.
